@@ -1,56 +1,60 @@
-#https://www.geeksforgeeks.org/create-a-screen-recorder-using-python/
+#https://www.youtube.com/watch?v=fEdbtmrpFGw
 
 import numpy as np #numpy to work with data
-import pyautogui #pyautogui to work with?
+from PIL import ImageGrab #PIL replaces pyautogui
 import cv2 #cv2 to work with codec (what is codec?)
+from screeninfo import get_monitors #automatic monitor info
 
-#video parameters#
-#resolution of video
-resolution_normal = (1920, 1080)
+#get main monitor info  
+for monitor in get_monitors():
+    if monitor.x == 0 and monitor.y == 0:
+        monitor_x: int = monitor.x
+        monitor_y: int = monitor.y
+        monitor_width: int = monitor.width
+        monitor_height: int = monitor.height
 
-#video codec
-codec = cv2.VideoWriter_fourcc(*"XVID")
-
-#output file name
-filename = "fresh_clip.avi"
-
-#frames per second of video recording
-fps = 30.0 #save data :c
-#video parameters#
-
-#video writer object to take in video recording parameters
-out = cv2.VideoWriter(filename, codec, fps, resolution)
-
-#real time video parameters
-#real time video recording
+# #real time video recording
 cv2.namedWindow("fresh clip cooking", cv2.WINDOW_NORMAL)
 
 #resize real time video to not cover content
 cv2.resizeWindow("fresh clip cooking", 480, 270)
 
-#video loop
+#images captured per second
+fps = 30
+
+#encoding for video
+fourcc = cv2.VideoWriter_fourcc("m", "p", "4", "v")
+
+#create capture object
+captured_video = cv2.VideoWriter("freshly_baked.mp4", fourcc, fps, (monitor_width, monitor_height))
+
 while True:
-    #Take screenshot using PyAutoGUI
-    img = pyautogui.screenshot()
+    #fetch current display and create image
+    image = ImageGrab.grab(bbox=(monitor_x,
+                          monitor_y,
+                          monitor_width, 
+                          monitor_height))
+    
+    #convert image to numpy image
+    np_image = np.array(image)
 
-    #Convert screenshot to numpy array format
-    frame = np.array(img)
-
-    #convert from BGR to RBG (what is BGR??)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    #write reformatted image to output file
-    out.write(frame)
+    #convert numpy image to cvt (why t?) image
+    cvt_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2RGB)
 
     #display mini screen
-    cv2.imshow('fresh clip cooking', frame)
+    cv2.imshow('fresh clip cooking', cvt_image)
 
-    #exit recording with "q"
-    if cv2.waitKey(1) ==ord('q'):
+    #save images to video file
+    captured_video.write(cvt_image)
+
+    #exit with escape on the clip window
+    key = cv2.waitKey(20)
+    if key == 27:
         break
 
 #release video writer// why?
-out.release
+captured_video.release()
 
 #destroy created windows during video recording and showing
 cv2.destroyAllWindows()
+
