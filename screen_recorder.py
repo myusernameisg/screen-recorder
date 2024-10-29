@@ -1,5 +1,12 @@
 #https://www.youtube.com/watch?v=fEdbtmrpFGw
 
+#TODO
+#fix recording of games eg mc
+#test on other machines
+#send file and open in another machine
+#add audio support
+#make it so that a new file is created rather than one getting overwritten
+
 import numpy as np #numpy to work with data
 from PIL import ImageGrab #PIL replaces pyautogui
 import cv2 #cv2 to work with codec (what is codec?)
